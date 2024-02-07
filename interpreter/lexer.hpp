@@ -9,9 +9,11 @@ class Lexer {
     std::vector< Token > tokens;
     int line = 1;
 
+    char peek();
     bool is_at_end();
     char advance();
     void scan_token();
+    void scan_comment();
     void add_token( TokenType type );
 
 public:

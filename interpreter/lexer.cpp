@@ -9,6 +9,8 @@ Lexer::Lexer( std::string source_code )
 
 bool Lexer::is_at_end() { return pointer == source_code.length(); }
 
+char Lexer::peek() { return is_at_end() ? '\n' : source_code[ pointer ]; }
+
 char Lexer::advance()
 {
     assert( !is_at_end() );
@@ -17,28 +19,45 @@ char Lexer::advance()
     return c;
 }
 
+void Lexer::scan_comment()
+{
+    while ( peek() != '\n' && !is_at_end() ) {
+        advance();
+    }
+}
+
 void Lexer::add_token( TokenType type ) { tokens.emplace_back( type, "", line ); }
 
 void Lexer::scan_token()
 {
     char c = advance();
 
-    if ( isblank( c ) ) {
+    if ( isspace( c ) ) {
+        if ( c == '\n' )
+            line++;
+
         return;
     }
 
     switch ( c ) {
         // Single-character tokens.
-        case '(': add_token( LEFT_PARANTHESES ); break;
-        case ')': add_token( RIGHT_PARANTHESES ); break;
-        case '{': add_token( LEFT_BRACKET ); break;
-        case '}': add_token( RIGHT_BRACKET ); break;
-        case ',': add_token( COMMA ); break;
-        case '.': add_token( DOT ); break;
-        case '-': add_token( MINUS ); break;
-        case '+': add_token( PLUS ); break;
-        case ';': add_token( SEMICOLON ); break;
-        case '*': add_token( STAR ); break;
+        case '(': add_token( TokenType::LEFT_PARANTHESES ); break;
+        case ')': add_token( TokenType::RIGHT_PARANTHESES ); break;
+        case '{': add_token( TokenType::LEFT_BRACKET ); break;
+        case '}': add_token( TokenType::RIGHT_BRACKET ); break;
+        case ',': add_token( TokenType::COMMA ); break;
+        case '.': add_token( TokenType::DOT ); break;
+        case '-': add_token( TokenType::MINUS ); break;
+        case '+': add_token( TokenType::PLUS ); break;
+        case ';': add_token( TokenType::SEMICOLON ); break;
+        case '*': add_token( TokenType::STAR ); break;
+
+        // Binary operators
+        case '!': add_token( peek() == '=' ? TokenType::NOT_EQUAL : TokenType::NEGATION ); break;
+        case '=': add_token( peek() == '=' ? TokenType::EQUAL : TokenType::EQUAL_EQUAL ); break;
+        case '<': add_token( peek() == '=' ? TokenType::LESS_EQUAL : TokenType::LESS ); break;
+        case '>': add_token( peek() == '=' ? TokenType::GREATER_EQUAL : TokenType::GREATER ); break;
+        case '/': peek() == '/' ? scan_comment() : add_token( TokenType::SLASH ); break;
 
         default: break;
     }
