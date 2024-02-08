@@ -76,7 +76,9 @@ class Lexer {
     std::size_t start = 0;
     std::vector< Token > tokens;
     int line = 1;
+    bool had_error = false;
 
+    void error( std::string );
     bool match( char c );
     char peek();
     char peek( std::size_t );

@@ -7,8 +7,6 @@ template < class... Ts >
 struct overload : Ts... {
     using Ts::operator()...;
 };
-template < class... Ts >
-overload( Ts... ) -> overload< Ts... >;
 
 std::ostream& operator<<( std::ostream& os, const Token& token )
 {

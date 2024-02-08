@@ -1,13 +1,22 @@
 #include <cassert>
+#include <interpreter/error.hpp>
 #include <interpreter/lexer.hpp>
 #include <interpreter/token.hpp>
 #include <iostream>
+#include <string>
 
 Indetifier_map Lexer::map;
 
 Lexer::Lexer( std::string source_code )
     : source_code( source_code )
 {}
+
+void Lexer::error( std::string message )
+{
+    had_error = true;
+    return show_error( line, "lexing error", message );
+}
+
 
 bool Lexer::is_at_end() { return pointer == source_code.length(); }
 
@@ -39,17 +48,21 @@ char Lexer::advance()
 
 void Lexer::scan_number()
 {
+    bool is_double = false;
     while ( isdigit( peek() ) )
         advance();
 
-    if ( peek() == '.' && isdigit( peek( 1 ) ) )
+    if ( peek() == '.' && isdigit( peek( 1 ) ) ) {
+        is_double = true;
         advance();
+    }
 
     while ( isdigit( peek() ) )
         advance();
 
     std::string lexeme = source_code.substr( start, pointer - start );
-    add_token( TokenType::NUMBER, lexeme );
+    is_double ? add_token( TokenType::NUMBER, std::stod( lexeme ) ) :
+                add_token( TokenType::NUMBER, std::stoi( lexeme ) );
 }
 
 
@@ -77,7 +90,7 @@ void Lexer::scan_string_literal()
     }
 
     if ( is_at_end() ) {
-        // Error
+        return error( "Unterminated string literal" );
     }
 
     advance();
@@ -141,6 +154,9 @@ void Lexer::scan_token()
                 scan_number();
             else if ( isalpha( c ) )
                 scan_identifier();
+            else
+                return error( "Unknown character" );
+
             break;
     }
 }
