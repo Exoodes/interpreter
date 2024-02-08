@@ -9,6 +9,15 @@ Lexer::Lexer( std::string source_code )
 
 bool Lexer::is_at_end() { return pointer == source_code.length(); }
 
+bool Lexer::match( char c )
+{
+    if ( is_at_end() || source_code[ pointer ] != c )
+        return false;
+
+    pointer++;
+    return true;
+}
+
 char Lexer::peek() { return is_at_end() ? '\n' : source_code[ pointer ]; }
 
 char Lexer::advance()
@@ -53,10 +62,10 @@ void Lexer::scan_token()
         case '*': add_token( TokenType::STAR ); break;
 
         // Binary operators
-        case '!': add_token( peek() == '=' ? TokenType::NOT_EQUAL : TokenType::NEGATION ); break;
-        case '=': add_token( peek() == '=' ? TokenType::EQUAL : TokenType::EQUAL_EQUAL ); break;
-        case '<': add_token( peek() == '=' ? TokenType::LESS_EQUAL : TokenType::LESS ); break;
-        case '>': add_token( peek() == '=' ? TokenType::GREATER_EQUAL : TokenType::GREATER ); break;
+        case '!': add_token( match( '=' ) ? TokenType::NOT_EQUAL : TokenType::NEGATION ); break;
+        case '=': add_token( match( '=' ) ? TokenType::EQUAL_EQUAL : TokenType::EQUAL ); break;
+        case '<': add_token( match( '=' ) ? TokenType::LESS_EQUAL : TokenType::LESS ); break;
+        case '>': add_token( match( '=' ) ? TokenType::GREATER_EQUAL : TokenType::GREATER ); break;
         case '/': peek() == '/' ? scan_comment() : add_token( TokenType::SLASH ); break;
 
         default: break;

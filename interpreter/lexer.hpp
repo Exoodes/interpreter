@@ -9,6 +9,7 @@ class Lexer {
     std::vector< Token > tokens;
     int line = 1;
 
+    bool match(char c);
     char peek();
     bool is_at_end();
     char advance();
