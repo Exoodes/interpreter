@@ -18,7 +18,14 @@ bool Lexer::match( char c )
     return true;
 }
 
-char Lexer::peek() { return is_at_end() ? '\n' : source_code[ pointer ]; }
+char Lexer::peek( std::size_t offset )
+{
+    if ( pointer + offset >= source_code.size() )
+        return '\0';
+    return source_code[ pointer + offset ];
+}
+
+char Lexer::peek() { return peek( 0 ); }
 
 char Lexer::advance()
 {
@@ -28,9 +35,26 @@ char Lexer::advance()
     return c;
 }
 
+void Lexer::scan_number()
+{
+    while ( isdigit( peek() ) )
+        advance();
+
+    if ( peek() == '.' && isdigit( peek( 1 ) ) ) {
+        advance();
+    }
+
+    while ( isdigit( peek() ) )
+        advance();
+
+    std::string value = source_code.substr( start, pointer - start );
+    add_token( TokenType::NUMBER, value );
+}
+
+void Lexer::scan_identifier() {}
+
 void Lexer::scan_string_literal()
 {
-    int start = pointer - 1;
     while ( peek() != '"' && !is_at_end() ) {
         if ( peek() == '\n' )
             line++;
@@ -94,13 +118,20 @@ void Lexer::scan_token()
         case '/': peek() == '/' ? scan_comment() : add_token( TokenType::SLASH ); break;
 
         case '"': scan_string_literal(); break;
-        default: break;
+
+        default:
+            if ( isdigit( c ) )
+                scan_number();
+            else if ( isalpha( c ) )
+                scan_identifier();
+            break;
     }
 }
 
 std::vector< Token > Lexer::generete_tokens()
 {
     while ( !is_at_end() ) {
+        start = pointer;
         scan_token();
     }
 
