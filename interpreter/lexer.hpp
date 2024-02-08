@@ -88,7 +88,7 @@ class Lexer {
     void scan_number();
     void scan_identifier();
     void add_token( TokenType type );
-    void add_token( TokenType type, std::string value );
+    void add_token( TokenType type, token_value_t value );
 
 public:
     static Indetifier_map map;

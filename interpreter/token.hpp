@@ -47,6 +47,7 @@ enum class TokenType {
     FALSE,
     TRUE,
 
+    // TODO
     AND,
     CLASS,
     NIL,
@@ -60,15 +61,19 @@ enum class TokenType {
     UNKNOW
 };
 
+using token_value_t = std::variant< int, double, std::string, std::monostate >;
+
 struct Token {
     TokenType type;
+    token_value_t value;
     std::string lexeme;
     int line;
 
     friend std::ostream& operator<<( std::ostream& os, const Token& token );
 
-    Token( TokenType type, std::string lexeme, int line )
+    Token( TokenType type, token_value_t value, std::string lexeme, int line )
         : type( type )
+        , value( value )
         , lexeme( lexeme )
         , line( line )
     {}

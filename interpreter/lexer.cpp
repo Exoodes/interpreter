@@ -42,15 +42,14 @@ void Lexer::scan_number()
     while ( isdigit( peek() ) )
         advance();
 
-    if ( peek() == '.' && isdigit( peek( 1 ) ) ) {
+    if ( peek() == '.' && isdigit( peek( 1 ) ) )
         advance();
-    }
 
     while ( isdigit( peek() ) )
         advance();
 
-    std::string value = source_code.substr( start, pointer - start );
-    add_token( TokenType::NUMBER, value );
+    std::string lexeme = source_code.substr( start, pointer - start );
+    add_token( TokenType::NUMBER, lexeme );
 }
 
 
@@ -59,13 +58,13 @@ void Lexer::scan_identifier()
     while ( isalnum( peek() ) )
         advance();
 
-    std::string value = source_code.substr( start, pointer - start );
-    TokenType type = Lexer::map.get( value );
+    std::string lexeme = source_code.substr( start, pointer - start );
+    TokenType type = Lexer::map.get( lexeme );
 
     if ( type == TokenType::UNKNOW )
         type = TokenType::IDENTIFIER;
 
-    add_token( type, value );
+    add_token( type, lexeme );
 }
 
 void Lexer::scan_string_literal()
@@ -94,11 +93,12 @@ void Lexer::scan_comment()
     }
 }
 
-void Lexer::add_token( TokenType type ) { add_token( type, "" ); }
+void Lexer::add_token( TokenType type ) { add_token( type, std::monostate{} ); }
 
-void Lexer::add_token( TokenType type, std::string value )
+void Lexer::add_token( TokenType type, token_value_t value )
 {
-    tokens.emplace_back( type, value, line );
+    std::string lexem = source_code.substr( start, pointer - start );
+    tokens.emplace_back( type, value, lexem, line );
 }
 
 void Lexer::scan_token()
@@ -113,7 +113,7 @@ void Lexer::scan_token()
     }
 
     switch ( c ) {
-        // Single-character tokens.
+        // Single-character tokens
         case '(': add_token( TokenType::LEFT_PARANTHESES ); break;
         case ')': add_token( TokenType::RIGHT_PARANTHESES ); break;
         case '{': add_token( TokenType::LEFT_BRACKET ); break;
@@ -125,7 +125,7 @@ void Lexer::scan_token()
         case ';': add_token( TokenType::SEMICOLON ); break;
         case '*': add_token( TokenType::STAR ); break;
 
-        // Binary operators
+        // Binary operator tokens
         case '!': add_token( match( '=' ) ? TokenType::NOT_EQUAL : TokenType::NEGATION ); break;
         case '=': add_token( match( '=' ) ? TokenType::EQUAL_EQUAL : TokenType::EQUAL ); break;
         case '<': add_token( match( '=' ) ? TokenType::LESS_EQUAL : TokenType::LESS ); break;
@@ -134,8 +134,8 @@ void Lexer::scan_token()
         case '&': add_token( match( '&' ) ? TokenType::LOGICAL_AND : TokenType::BIT_AND ); break;
         case '/': peek() == '/' ? scan_comment() : add_token( TokenType::SLASH ); break;
 
+        // Longer tokens
         case '"': scan_string_literal(); break;
-
         default:
             if ( isdigit( c ) )
                 scan_number();
