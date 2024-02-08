@@ -57,11 +57,7 @@ enum class TokenType {
 struct Token {
     TokenType type;
     std::string lexeme;
-
     int line;
 
-    friend std::ostream& operator<<( std::ostream& os, const Token& token )
-    {
-        return os << std::format( "Token( type: {}, line: {} )\n", print_type( token.type ), token.line );
-    }
+    friend std::ostream& operator<<( std::ostream& os, const Token& token );
 };

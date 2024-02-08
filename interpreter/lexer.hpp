@@ -9,13 +9,15 @@ class Lexer {
     std::vector< Token > tokens;
     int line = 1;
 
-    bool match(char c);
+    bool match( char c );
     char peek();
     bool is_at_end();
     char advance();
     void scan_token();
     void scan_comment();
+    void scan_string_literal();
     void add_token( TokenType type );
+    void add_token( TokenType type, std::string value );
 
 public:
     std::string source_code;

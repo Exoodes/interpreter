@@ -28,6 +28,26 @@ char Lexer::advance()
     return c;
 }
 
+void Lexer::scan_string_literal()
+{
+    int start = pointer - 1;
+    while ( peek() != '"' && !is_at_end() ) {
+        if ( peek() == '\n' )
+            line++;
+
+        advance();
+    }
+
+    if ( is_at_end() ) {
+        // Error
+    }
+
+    advance();
+
+    std::string value = source_code.substr( start, pointer - start );
+    add_token( TokenType::STRING, value );
+}
+
 void Lexer::scan_comment()
 {
     while ( peek() != '\n' && !is_at_end() ) {
@@ -35,7 +55,12 @@ void Lexer::scan_comment()
     }
 }
 
-void Lexer::add_token( TokenType type ) { tokens.emplace_back( type, "", line ); }
+void Lexer::add_token( TokenType type ) { add_token( type, "" ); }
+
+void Lexer::add_token( TokenType type, std::string value )
+{
+    tokens.emplace_back( type, value, line );
+}
 
 void Lexer::scan_token()
 {
@@ -68,6 +93,7 @@ void Lexer::scan_token()
         case '>': add_token( match( '=' ) ? TokenType::GREATER_EQUAL : TokenType::GREATER ); break;
         case '/': peek() == '/' ? scan_comment() : add_token( TokenType::SLASH ); break;
 
+        case '"': scan_string_literal(); break;
         default: break;
     }
 }
