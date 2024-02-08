@@ -4,7 +4,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -Wall -Wextra -std=c++23 -I. -ggdb3
+CXXFLAGS = -Wall -Wextra -std=c++23 -I.
 
 # Valgrind flags
 VLAGRINDFLAGS = --leak-check=full --show-leak-kinds=all --track-origins=yes
@@ -31,6 +31,10 @@ all: $(EXECUTABLE)
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $@
 
+# Rule to link object files into the executable for valgrind
+$(EXECUTABLE_VALGRIND): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -ggdb3 $(OBJECTS) -o $@
+
 # Rule to compile each source file into object files
 $(OUTPUTDIR)/%.o: $(SRCDIR)/%.cpp | $(OUTPUTDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -44,7 +48,7 @@ run: $(EXECUTABLE)
 	@./$(EXECUTABLE) input
 
 # Run target under valgrind
-valgrind: $(EXECUTABLE)
+valgrind: $(EXECUTABLE_VALGRIND)
 	@valgrind $(VLAGRINDFLAGS) ./$(EXECUTABLE) input
 
 
