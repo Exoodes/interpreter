@@ -4,7 +4,10 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -Wall -Wextra -std=c++23 -I.
+CXXFLAGS = -Wall -Wextra -std=c++23 -I. -ggdb3
+
+# Valgrind flags
+VLAGRINDFLAGS = --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 # Source directory
 SRCDIR = interpreter
@@ -39,6 +42,11 @@ $(OUTPUTDIR):
 # Run target
 run: $(EXECUTABLE)
 	@./$(EXECUTABLE) input
+
+# Run target under valgrind
+valgrind: $(EXECUTABLE)
+	@valgrind $(VLAGRINDFLAGS) ./$(EXECUTABLE) input
+
 
 # Clean target
 clean:
