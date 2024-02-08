@@ -3,6 +3,8 @@
 #include <interpreter/token.hpp>
 #include <iostream>
 
+Indetifier_map Lexer::map;
+
 Lexer::Lexer( std::string source_code )
     : source_code( source_code )
 {}
@@ -51,7 +53,20 @@ void Lexer::scan_number()
     add_token( TokenType::NUMBER, value );
 }
 
-void Lexer::scan_identifier() {}
+
+void Lexer::scan_identifier()
+{
+    while ( isalnum( peek() ) )
+        advance();
+
+    std::string value = source_code.substr( start, pointer - start );
+    TokenType type = Lexer::map.get( value );
+
+    if ( type == TokenType::UNKNOW )
+        type = TokenType::IDENTIFIER;
+
+    add_token( type, value );
+}
 
 void Lexer::scan_string_literal()
 {
@@ -115,6 +130,8 @@ void Lexer::scan_token()
         case '=': add_token( match( '=' ) ? TokenType::EQUAL_EQUAL : TokenType::EQUAL ); break;
         case '<': add_token( match( '=' ) ? TokenType::LESS_EQUAL : TokenType::LESS ); break;
         case '>': add_token( match( '=' ) ? TokenType::GREATER_EQUAL : TokenType::GREATER ); break;
+        case '|': add_token( match( '|' ) ? TokenType::LOGICAL_OR : TokenType::BIT_OR ); break;
+        case '&': add_token( match( '&' ) ? TokenType::LOGICAL_AND : TokenType::BIT_AND ); break;
         case '/': peek() == '/' ? scan_comment() : add_token( TokenType::SLASH ); break;
 
         case '"': scan_string_literal(); break;

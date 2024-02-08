@@ -1,7 +1,6 @@
 #pragma once
 
 #include <format>
-#include <interpreter/common.hpp>
 #include <ostream>
 #include <string>
 
@@ -28,6 +27,10 @@ enum class TokenType {
     GREATER_EQUAL,
     LESS,
     LESS_EQUAL,
+    LOGICAL_AND,
+    BIT_AND,
+    LOGICAL_OR,
+    BIT_OR,
 
     // Literals.
     IDENTIFIER,
@@ -35,23 +38,26 @@ enum class TokenType {
     NUMBER,
 
     // Keywords.
-    AND,
-    CLASS,
-    ELSE,
-    FALSE,
     FN,
     FOR,
+    ELSE,
     IF,
+    WHILE,
+    RETURN,
+    FALSE,
+    TRUE,
+
+    AND,
+    CLASS,
     NIL,
     OR,
     PRINT,
-    RETURN,
     SUPER,
     THIS,
-    TRUE,
     VAR,
-    WHILE,
-    EOF_T
+    EOF_T,
+
+    UNKNOW
 };
 
 struct Token {
@@ -60,4 +66,10 @@ struct Token {
     int line;
 
     friend std::ostream& operator<<( std::ostream& os, const Token& token );
+
+    Token( TokenType type, std::string lexeme, int line )
+        : type( type )
+        , lexeme( lexeme )
+        , line( line )
+    {}
 };
