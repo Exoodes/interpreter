@@ -36,6 +36,8 @@ enum class TokenType {
     IDENTIFIER,
     STRING,
     NUMBER,
+    DOUBLE,
+    INTEGER,
 
     // Keywords.
     FN,

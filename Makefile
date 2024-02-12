@@ -19,7 +19,7 @@ SRCDIR = interpreter
 OUTPUTDIR = build
 
 # Source files
-EXCLUDE = $(shell find . -name "*.test.*" | sed 's/^\.\///')
+EXCLUDE = $(shell find . -name "*.test.cpp" | sed 's/^\.\///')
 SOURCES = $(filter-out $(EXCLUDE), $(wildcard $(SRCDIR)/*.cpp))
 
 # Object files
@@ -54,8 +54,6 @@ TEST_SOURCES = $(wildcard $(TESTDIR)/*.cpp)
 TEST_OBJECTS := $(filter-out build/interpreter.o, $(OBJECTS))
 TEST_OBJECTS += $(patsubst $(TESTDIR)/%.cpp,$(OUTPUTDIR)/%.o,$(TEST_SOURCES))
 TEST_OBJECTS += $(patsubst $(SRCDIR)/%.cpp,$(OUTPUTDIR)/%.o,$(EXCLUDE))
-# $(info    TMP is $(TMP))
-# $(info    EXCLUDE is $(EXCLUDE))
 
 # Tets executable name
 TEST_EXECUTABLE = interpreter_tests

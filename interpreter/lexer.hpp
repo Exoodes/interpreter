@@ -49,6 +49,10 @@ struct Indetifier_map {
         add( TokenType::GREATER_EQUAL, "greater_equal" );
         add( TokenType::LESS, "less" );
         add( TokenType::LESS_EQUAL, "less_equal" );
+        add( TokenType::LOGICAL_OR, "logical_or" );
+        add( TokenType::BIT_OR, "bit_or" );
+        add( TokenType::LOGICAL_AND, "logical_and" );
+        add( TokenType::BIT_AND, "bit_aand" );
 
         add( TokenType::IDENTIFIER, "identifier" );
         add( TokenType::STRING, "string" );
@@ -78,24 +82,28 @@ class Lexer {
     std::size_t start = 0;
     std::vector< Token > tokens;
     int line = 1;
-    bool had_error = false;
 
     void error( std::string );
+
     bool match( char c );
     char peek();
     char peek( std::size_t );
     bool is_at_end();
     char advance();
+
     void scan_token();
+
     void scan_comment();
     void scan_string_literal();
     void scan_number();
     void scan_identifier();
+
     void add_token( TokenType type );
     void add_token( TokenType type, token_value_t value );
 
 public:
     static Indetifier_map map;
+    bool had_error = false;
     std::string source_code;
 
     Lexer( std::string );
