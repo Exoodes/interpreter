@@ -13,7 +13,7 @@ int main( int, const char** argv )
     std::vector< Token > tokens = lexer.generete_tokens();
 
     for ( auto& t : tokens ) {
-        std::cout << t;
+        std::cout << t << std::endl;
     }
 
     return EXIT_SUCCESS;

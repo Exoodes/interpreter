@@ -10,17 +10,17 @@ struct overload : Ts... {
 
 std::ostream& operator<<( std::ostream& os, const Token& token )
 {
-    os << std::format( "Token( type: {:18}, line: {:2}, lexeme: {}",
+    os << std::format( "Token( type: {:18}, line: {:2}, lexeme: \"{}\"",
                        Lexer::map.get( token.type ),
                        token.line,
                        token.lexeme );
 
 
-    std::visit( overload{ [ & ]( int i ) { os << std::format( ", int: {}", i ); },
-                          [ & ]( double d ) { os << std::format( ", double: {}", d ); },
-                          [ & ]( std::string s ) { os << std::format( ", string: \"{}\"", s ); },
+    std::visit( overload{ [ & ]( int ) { os << ", type: int"; },
+                          [ & ]( double ) { os << ", type: double"; },
+                          [ & ]( std::string ) { os << ", type: string"; },
                           [ & ]( std::monostate ) {} },
                 token.value );
 
-    return os << " )\n";
+    return os << " )";
 }

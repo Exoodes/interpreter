@@ -62,6 +62,8 @@ struct Indetifier_map {
         add( TokenType::RETURN, "return" );
         add( TokenType::FALSE, "false" );
         add( TokenType::TRUE, "true" );
+
+        // Extra ?
         add( TokenType::LESS_EQUAL, "less_equal" );
         add( TokenType::LESS_EQUAL, "less_equal" );
         add( TokenType::LESS_EQUAL, "less_equal" );

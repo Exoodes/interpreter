@@ -95,7 +95,7 @@ void Lexer::scan_string_literal()
 
     advance();
 
-    std::string value = source_code.substr( start, pointer - start );
+    std::string value = source_code.substr( start + 1, pointer - start - 1 );
     add_token( TokenType::STRING, value );
 }
 
