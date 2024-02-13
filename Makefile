@@ -27,6 +27,7 @@ OBJECTS = $(patsubst $(SRCDIR)/%.cpp,$(OUTPUTDIR)/%.o,$(SOURCES))
 
 # Executable name
 EXECUTABLE = my_interpreter
+EXECUTABLE_VALGRIND := $(EXECUTABLE)_val
 
 # Default target
 all: $(EXECUTABLE)
@@ -37,7 +38,7 @@ $(EXECUTABLE): $(OBJECTS)
 
 # Rule to link object files into the executable for valgrind
 $(EXECUTABLE_VALGRIND): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -ggdb3 $(OBJECTS) -o $@
+	$(CXX) $(CXXFLAGS) -g -ggdb3 $(OBJECTS) -o $@
 
 # Rule to compile each source file into object files
 $(OUTPUTDIR)/%.o: $(SRCDIR)/%.cpp | $(OUTPUTDIR)
@@ -76,7 +77,7 @@ run: $(EXECUTABLE)
 
 # Run target under valgrind
 valgrind: $(EXECUTABLE_VALGRIND)
-	@valgrind $(VLAGRINDFLAGS) ./$(EXECUTABLE) input
+	@valgrind $(VLAGRINDFLAGS) ./$(EXECUTABLE_VALGRIND) input
 
 test: $(TEST_EXECUTABLE)
 	@./$(TEST_EXECUTABLE)

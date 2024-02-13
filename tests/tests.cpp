@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <interpreter/lexer.hpp>
 #include <iostream>
+#include <tests/tests.helper.hpp>
 
 int main( int argc, char** argv )
 {

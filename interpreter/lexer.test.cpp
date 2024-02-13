@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <interpreter/lexer.hpp>
 #include <iostream>
+#include <tests/tests.helper.hpp>
 #include <variant>
 
 void check_token( Token token,
@@ -11,12 +12,6 @@ void check_token( Token token,
     EXPECT_EQ( token.type, type );
     EXPECT_EQ( token.value, value );
     EXPECT_EQ( token.line, line_number.value_or( token.line ) );
-
-    if ( std::holds_alternative< std::string >( token.value ) ) {
-        auto tmp_1 = std::get< std::string >( token.value );
-        auto tmp_2 = std::get< std::string >( value );
-        std::cout << std::quoted( tmp_1 ) << " - " << std::quoted( tmp_2 ) << std::endl;
-    }
 }
 
 TEST( LexerTokenizerTest, SimpleTokens )
@@ -107,35 +102,74 @@ TEST( LexerTokenizerTest, Comments )
 
 TEST( LexerTokenizeStringLiteral, Empty )
 {
-    Lexer lexer( R"("")" );
+    Lexer lexer( R"(""           ""
+                    
+                                        ""
+
+
+                                        ""
+                    "")" );
 
     auto output = lexer.generete_tokens();
     EXPECT_FALSE( lexer.had_error );
-    EXPECT_EQ( output.size(), 1 );
+    EXPECT_EQ( output.size(), 5 );
 
     check_token( output[ 0 ], TokenType::STRING, R"()", 1 );
+    check_token( output[ 1 ], TokenType::STRING, R"()", 1 );
+    check_token( output[ 2 ], TokenType::STRING, R"()", 3 );
+    check_token( output[ 3 ], TokenType::STRING, R"()", 6 );
+    check_token( output[ 4 ], TokenType::STRING, R"()", 7 );
 }
 
 TEST( LexerTokenizeStringLiteral, Blank )
 {
-    Lexer lexer( R"(" ")"
-                 R"("  ")" );
+    Lexer lexer( R"(" ""  "
+                    "   "
+                    "    "
+
+
+                    "     ")" );
+
+    auto output = lexer.generete_tokens();
+    EXPECT_FALSE( lexer.had_error );
+    EXPECT_EQ( output.size(), 5 );
+
+    check_token( output[ 0 ], TokenType::STRING, R"( )", 1 );
+    check_token( output[ 1 ], TokenType::STRING, R"(  )", 1 );
+    check_token( output[ 2 ], TokenType::STRING, R"(   )", 2 );
+    check_token( output[ 3 ], TokenType::STRING, R"(    )", 3 );
+    check_token( output[ 4 ], TokenType::STRING, R"(     )", 6 );
+}
+
+TEST( LexerTokenizeStringLiteral, Short )
+{
+    Lexer lexer( R"(   "abc"   " a b c "
+                    )" );
 
     auto output = lexer.generete_tokens();
     EXPECT_FALSE( lexer.had_error );
     EXPECT_EQ( output.size(), 2 );
 
-    check_token( output[ 0 ], TokenType::STRING, R"( )", 1 );
-    check_token( output[ 1 ], TokenType::STRING, R"(  )", 1 );
+    check_token( output[ 0 ], TokenType::STRING, R"(abc)", 1 );
+    check_token( output[ 1 ], TokenType::STRING, R"( a b c )", 1 );
 }
 
-TEST( LexerTokenizeStringLiteral, Short )
+
+TEST( LexerTokenizeStringLiteral, Unterminated )
 {
-    Lexer lexer( R"("abc")" );
+    auto check_unterminated =
+    []( std::string code ) {
+        NullStream error_stream;
+        Lexer lexer( code, error_stream );
+        lexer.generete_tokens();
+        EXPECT_TRUE( lexer.had_error );
+    };
 
-    auto output = lexer.generete_tokens();
-    EXPECT_FALSE( lexer.had_error );
-    EXPECT_EQ( output.size(), 1 );
+    check_unterminated( R"(   "
+                    )" );
+    check_unterminated( R"(")" );
+    check_unterminated( R"(
 
-    check_token( output[ 0 ], TokenType::STRING, R"(abc)", 1 );
+
+        ")" );
 }

@@ -8,13 +8,19 @@
 Indetifier_map Lexer::map;
 
 Lexer::Lexer( std::string source_code )
-    : source_code( source_code )
+    : error_stream( std::cerr )
+    , source_code( source_code )
+{}
+
+Lexer::Lexer( std::string source_code, std::ostream& error_stream )
+    : error_stream( error_stream )
+    , source_code( source_code )
 {}
 
 void Lexer::error( std::string message )
 {
     had_error = true;
-    return show_error( line, "lexing error", message );
+    return show_error( line, "lexing error", message, error_stream );
 }
 
 
@@ -43,6 +49,7 @@ char Lexer::advance()
     assert( !is_at_end() );
     char c = source_code[ pointer ];
     pointer++;
+    token_len++;
     return c;
 }
 
@@ -95,7 +102,7 @@ void Lexer::scan_string_literal()
 
     advance();
 
-    std::string value = source_code.substr( start + 1, pointer - start - 1 );
+    std::string value = source_code.substr( start + 1, token_len - 2 );
     add_token( TokenType::STRING, value );
 }
 
@@ -165,6 +172,7 @@ std::vector< Token > Lexer::generete_tokens()
 {
     while ( !is_at_end() ) {
         start = pointer;
+        token_len = 0;
         scan_token();
     }
 

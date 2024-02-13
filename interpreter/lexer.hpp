@@ -57,6 +57,8 @@ struct Indetifier_map {
         add( TokenType::IDENTIFIER, "identifier" );
         add( TokenType::STRING, "string" );
         add( TokenType::NUMBER, "number" );
+        add( TokenType::INTEGER, "integer" );
+        add( TokenType::DOUBLE, "double" );
 
         add( TokenType::FN, "fn" );
         add( TokenType::FOR, "for" );
@@ -80,7 +82,9 @@ struct Indetifier_map {
 class Lexer {
     std::size_t pointer = 0;
     std::size_t start = 0;
+    std::size_t token_len = 0;
     std::vector< Token > tokens;
+    std::ostream& error_stream;
     int line = 1;
 
     void error( std::string );
@@ -107,5 +111,6 @@ public:
     std::string source_code;
 
     Lexer( std::string );
+    Lexer( std::string, std::ostream& );
     std::vector< Token > generete_tokens();
 };
