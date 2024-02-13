@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <interpreter/lexer.hpp>
 #include <iostream>
+#include <limits>
+#include <ranges>
 #include <tests/tests.helper.hpp>
 #include <variant>
 
@@ -14,49 +16,79 @@ void check_token( Token token,
     EXPECT_EQ( token.line, line_number.value_or( token.line ) );
 }
 
+void check_error( std::string code )
+{
+    NullStream error_stream;
+    Lexer lexer( code, error_stream );
+    lexer.generete_tokens();
+    EXPECT_TRUE( lexer.had_error );
+}
+
 TEST( LexerTokenizerTest, SimpleTokens )
 {
     Lexer lexer( "(){},.-+;/*" );
+
+    auto types = { TokenType::LEFT_PARANTHESES,
+                   TokenType::RIGHT_PARANTHESES,
+                   TokenType::LEFT_BRACKET,
+                   TokenType::RIGHT_BRACKET,
+                   TokenType::COMMA,
+                   TokenType::DOT,
+                   TokenType::MINUS,
+                   TokenType::PLUS,
+                   TokenType::SEMICOLON,
+                   TokenType::SLASH,
+                   TokenType::STAR };
+
     auto output = lexer.generete_tokens();
     EXPECT_FALSE( lexer.had_error );
-    EXPECT_EQ( output.size(), 11 );
+    EXPECT_EQ( output.size(), types.size() );
 
-    check_token( output[ 0 ], TokenType::LEFT_PARANTHESES );
-    check_token( output[ 1 ], TokenType::RIGHT_PARANTHESES );
-    check_token( output[ 2 ], TokenType::LEFT_BRACKET );
-    check_token( output[ 3 ], TokenType::RIGHT_BRACKET );
-    check_token( output[ 4 ], TokenType::COMMA );
-    check_token( output[ 5 ], TokenType::DOT );
-    check_token( output[ 6 ], TokenType::MINUS );
-    check_token( output[ 7 ], TokenType::PLUS );
-    check_token( output[ 8 ], TokenType::SEMICOLON );
-    check_token( output[ 9 ], TokenType::SLASH );
-    check_token( output[ 10 ], TokenType::STAR );
+    for ( auto const [ index, token_type ] : std::views::enumerate( types ) ) {
+        check_token( output[ index ], token_type );
+    }
 }
 
-TEST( LexerTokenizerTest, BinaryOperations )
+TEST( LexerTokenizeBinaryOperations, Simple )
 {
     Lexer lexer( "! != = == < <= > >= | || & &&" );
+
+    auto types = { TokenType::NEGATION,    TokenType::NOT_EQUAL,     TokenType::EQUAL,
+                   TokenType::EQUAL_EQUAL, TokenType::LESS,          TokenType::LESS_EQUAL,
+                   TokenType::GREATER,     TokenType::GREATER_EQUAL, TokenType::BIT_OR,
+                   TokenType::LOGICAL_OR,  TokenType::BIT_AND,       TokenType::LOGICAL_AND };
+
     auto output = lexer.generete_tokens();
     EXPECT_FALSE( lexer.had_error );
-    EXPECT_EQ( output.size(), 12 );
+    EXPECT_EQ( output.size(), types.size() );
 
-    check_token( output[ 0 ], TokenType::NEGATION );
-    check_token( output[ 1 ], TokenType::NOT_EQUAL );
-    check_token( output[ 2 ], TokenType::EQUAL );
-    check_token( output[ 3 ], TokenType::EQUAL_EQUAL );
-    check_token( output[ 4 ], TokenType::LESS );
-    check_token( output[ 5 ], TokenType::LESS_EQUAL );
-    check_token( output[ 6 ], TokenType::GREATER );
-    check_token( output[ 7 ], TokenType::GREATER_EQUAL );
-    check_token( output[ 8 ], TokenType::BIT_OR );
-    check_token( output[ 9 ], TokenType::LOGICAL_OR );
-    check_token( output[ 10 ], TokenType::BIT_AND );
-    check_token( output[ 11 ], TokenType::LOGICAL_AND );
+    for ( auto const [ index, token_type ] : std::views::enumerate( types ) ) {
+        check_token( output[ index ], token_type );
+    }
+}
+
+TEST( LexerTokenizeBinaryOperations, Advanced )
+{
+    Lexer lexer( R"( =
+    = < =
+    &&&
+
+                    )" );
+
+    auto types = { TokenType::EQUAL, TokenType::EQUAL,       TokenType::LESS,
+                   TokenType::EQUAL, TokenType::LOGICAL_AND, TokenType::BIT_AND };
+
+    auto output = lexer.generete_tokens();
+    EXPECT_FALSE( lexer.had_error );
+    EXPECT_EQ( output.size(), types.size() );
+
+    for ( auto const [ index, token_type ] : std::views::enumerate( types ) ) {
+        check_token( output[ index ], token_type );
+    }
 }
 
 
-TEST( LexerTokenizerTest, Numbers )
+TEST( LexerTokenizeNumbers, Simple )
 {
     Lexer lexer( "1 123 99999999 -123 0.00005 123.123 99999.999 -231321.3232" );
     auto output = lexer.generete_tokens();
@@ -74,6 +106,8 @@ TEST( LexerTokenizerTest, Numbers )
     check_token( output[ 8 ], TokenType::MINUS );
     check_token( output[ 9 ], TokenType::DOUBLE, 231321.3232 );
 }
+
+TEST( LexerTokenizeNumbers, Overflow ) { check_error( "2147483648" ); }
 
 TEST( LexerTokenizerTest, Comments )
 {
@@ -100,7 +134,7 @@ TEST( LexerTokenizerTest, Comments )
     check_token( output[ 3 ], TokenType::RIGHT_PARANTHESES, std::monostate{}, 12 );
 }
 
-TEST( LexerTokenizeStringLiteral, Empty )
+TEST( LexerTokenizeStringLiterals, Empty )
 {
     Lexer lexer( R"(""           ""
                     
@@ -121,7 +155,7 @@ TEST( LexerTokenizeStringLiteral, Empty )
     check_token( output[ 4 ], TokenType::STRING, R"()", 7 );
 }
 
-TEST( LexerTokenizeStringLiteral, Blank )
+TEST( LexerTokenizeStringLiterals, Blank )
 {
     Lexer lexer( R"(" ""  "
                     "   "
@@ -141,7 +175,7 @@ TEST( LexerTokenizeStringLiteral, Blank )
     check_token( output[ 4 ], TokenType::STRING, R"(     )", 6 );
 }
 
-TEST( LexerTokenizeStringLiteral, Short )
+TEST( LexerTokenizeStringLiterals, Short )
 {
     Lexer lexer( R"(   "abc"   " a b c "
                     )" );
@@ -155,20 +189,12 @@ TEST( LexerTokenizeStringLiteral, Short )
 }
 
 
-TEST( LexerTokenizeStringLiteral, Unterminated )
+TEST( LexerTokenizeStringLiterals, Unterminated )
 {
-    auto check_unterminated =
-    []( std::string code ) {
-        NullStream error_stream;
-        Lexer lexer( code, error_stream );
-        lexer.generete_tokens();
-        EXPECT_TRUE( lexer.had_error );
-    };
-
-    check_unterminated( R"(   "
+    check_error( R"(   "
                     )" );
-    check_unterminated( R"(")" );
-    check_unterminated( R"(
+    check_error( R"(")" );
+    check_error( R"(
 
 
         ")" );

@@ -68,8 +68,13 @@ void Lexer::scan_number()
         advance();
 
     std::string lexeme = source_code.substr( start, pointer - start );
-    is_double ? add_token( TokenType::DOUBLE, std::stod( lexeme ) ) :
-                add_token( TokenType::INTEGER, std::stoi( lexeme ) );
+
+    try {
+        is_double ? add_token( TokenType::DOUBLE, std::stod( lexeme ) ) :
+                    add_token( TokenType::INTEGER, std::stoi( lexeme ) );
+    } catch ( const std::exception& e ) {
+        error(e.what());
+    }
 }
 
 
