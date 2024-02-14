@@ -24,7 +24,7 @@ void check_error( std::string code )
     EXPECT_TRUE( lexer.had_error );
 }
 
-TEST( LexerTokenizerTest, SimpleTokens )
+TEST( LexerTokenizeOneCharacterTokens, Simple )
 {
     Lexer lexer( "(){},.-+;/*" );
 
@@ -109,7 +109,7 @@ TEST( LexerTokenizeNumbers, Simple )
 
 TEST( LexerTokenizeNumbers, Overflow ) { check_error( "2147483648" ); }
 
-TEST( LexerTokenizerTest, Comments )
+TEST( LexerTokenizeComments, Simple )
 {
     Lexer lexer( "    //     1  \n"
                  "// 2 asdasd a 312321  sad !@#$%^&*( \n"
@@ -199,3 +199,11 @@ TEST( LexerTokenizeStringLiterals, Unterminated )
 
         ")" );
 }
+
+TEST( LexerTokenizeIdentifiers, ReservedWords ) {}
+TEST( LexerTokenizeIdentifiers, Identfiers ) {}
+TEST( LexerTokenizeIdentifiers, Mixed ) {}
+TEST( LexerTokenizeIdentifiers, InComments ) {}
+
+
+// TEST() {}

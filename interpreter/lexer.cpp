@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 
-Indetifier_map Lexer::map;
+Reserved_words_map Lexer::map;
 
 Lexer::Lexer( std::string source_code )
     : error_stream( std::cerr )
@@ -73,7 +73,7 @@ void Lexer::scan_number()
         is_double ? add_token( TokenType::DOUBLE, std::stod( lexeme ) ) :
                     add_token( TokenType::INTEGER, std::stoi( lexeme ) );
     } catch ( const std::exception& e ) {
-        error(e.what());
+        error( e.what() );
     }
 }
 

@@ -6,10 +6,8 @@
 int main( int argc, char** argv )
 {
     ::testing::InitGoogleTest( &argc, argv );
-    std::cout << "Running test" << std::endl;
-    int ret{ RUN_ALL_TESTS() };
-    if ( !ret )
-        return EXIT_SUCCESS;
-    else
+    if ( RUN_ALL_TESTS() )
         return EXIT_FAILURE;
+    else
+        return EXIT_SUCCESS;
 }
