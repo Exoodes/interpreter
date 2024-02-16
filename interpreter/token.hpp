@@ -35,7 +35,6 @@ enum class TokenType {
     // Literals.
     IDENTIFIER,
     STRING,
-    NUMBER,
     DOUBLE,
     INTEGER,
 
@@ -48,16 +47,12 @@ enum class TokenType {
     RETURN,
     FALSE,
     TRUE,
-
-    // TODO
-    AND,
+    LET,
     CLASS,
     NIL,
-    OR,
-    PRINT,
     SUPER,
     THIS,
-    VAR,
+    PRINT,
     EOF_T,
 
     UNKNOW
