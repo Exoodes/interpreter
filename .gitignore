@@ -4,6 +4,7 @@
 # Unignore all with extensions
 !*.cpp 
 !*.hpp
+!*.kr
 
 # Unignore all dirs
 !*/
