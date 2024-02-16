@@ -1,5 +1,6 @@
 #include <fstream>
 #include <interpreter/common.hpp>
+#include <interpreter/expression.hpp>
 #include <interpreter/lexer.hpp>
 #include <iostream>
 #include <sstream>
@@ -10,9 +11,12 @@ int main( int, const char** argv )
     Lexer lexer( file_contents );
     std::vector< Token > tokens = lexer.generete_tokens();
 
-    for ( auto& t : tokens ) {
-        // std::cout << t << std::endl;
-    }
+    auto expr = BinaryExpr( LiteralExpr( std::monostate{} ),
+                            Token( TokenType::PLUS, std::monostate{}, "+", 1 ),
+                            UnaryExpr( Token( TokenType::MINUS, std::monostate{}, "-", 1 ),
+                                       LiteralExpr( 12 ) ) );
+
+    PrintVisitor().print( expr );
 
     return EXIT_SUCCESS;
 }

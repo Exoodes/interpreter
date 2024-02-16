@@ -11,7 +11,7 @@ std::vector< fs::directory_entry > get_test_files()
 {
     std::vector< fs::directory_entry > out;
     for ( auto file : fs::recursive_directory_iterator( "tests/input" ) )
-        if ( fs::is_regular_file( file.status() ) && file.path().extension() == ".test" )
+        if ( fs::is_regular_file( file.status() ) && file.path().extension() == ".kr" )
             out.push_back( file );
 
     return out;
