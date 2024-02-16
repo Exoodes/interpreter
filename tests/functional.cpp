@@ -1,5 +1,8 @@
 #include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
+#include <interpreter/common.hpp>
+#include <interpreter/lexer.hpp>
 #include <iostream>
 
 namespace fs = std::filesystem;
@@ -8,7 +11,7 @@ std::vector< fs::directory_entry > get_test_files()
 {
     std::vector< fs::directory_entry > out;
     for ( auto file : fs::recursive_directory_iterator( "tests/input" ) )
-        if ( fs::is_regular_file( file.status() ) )
+        if ( fs::is_regular_file( file.status() ) && file.path().extension() == ".test" )
             out.push_back( file );
 
     return out;
@@ -32,7 +35,14 @@ public:
 };
 
 
-TEST_P( FileTests, Lexer ) {}
+TEST_P( FileTests, Lexer )
+{
+    std::string file_contents = get_file_contents( GetParam().path() );
+    Lexer lexer( file_contents );
+
+    lexer.generete_tokens();
+    EXPECT_FALSE( lexer.had_error );
+}
 
 TEST_P( FileTests, Grammar ) {}
 
