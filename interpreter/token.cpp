@@ -11,7 +11,7 @@ struct overload : Ts... {
 std::ostream& operator<<( std::ostream& os, const Token& token )
 {
     os << std::format( "Token( type: {:18}, line: {:2}, lexeme: \"{}\"",
-                       Lexer::map.get( token.type ),
+                       lexer::Lexer::map.get( token.type ),
                        token.line,
                        token.lexeme );
 

@@ -8,7 +8,7 @@
 int main( int, const char** argv )
 {
     std::string file_contents = get_file_contents( argv[ 1 ] );
-    Lexer lexer( file_contents );
+    lexer::Lexer lexer( file_contents );
     std::vector< Token > tokens = lexer.generete_tokens();
 
     BaseExprPtr expr =

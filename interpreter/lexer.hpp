@@ -6,6 +6,10 @@
 #include <string>
 #include <vector>
 
+namespace lexer
+{
+
+
 struct Reserved_words_map;
 
 class Lexer {
@@ -116,3 +120,4 @@ struct Reserved_words_map {
         add( TokenType::UNKNOW, "unknonw" );
     }
 };
+} // namespace lexer

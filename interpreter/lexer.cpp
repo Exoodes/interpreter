@@ -5,6 +5,8 @@
 #include <iostream>
 #include <string>
 
+namespace lexer
+{
 Reserved_words_map Lexer::map;
 
 Lexer::Lexer( std::string source_code )
@@ -183,3 +185,5 @@ std::vector< Token > Lexer::generete_tokens()
 
     return tokens;
 }
+
+} // namespace lexer

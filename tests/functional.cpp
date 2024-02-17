@@ -5,6 +5,7 @@
 #include <interpreter/lexer.hpp>
 #include <iostream>
 
+using namespace lexer;
 namespace fs = std::filesystem;
 
 std::vector< fs::directory_entry > get_test_files()

@@ -6,6 +6,8 @@
 #include <tests/tests.helper.hpp>
 #include <variant>
 
+using namespace lexer;
+
 void check_token( Token token,
                   TokenType type,
                   token_value_t value = std::monostate{},
