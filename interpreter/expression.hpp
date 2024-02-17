@@ -2,6 +2,16 @@
 
 #include <interpreter/token.hpp>
 #include <iostream>
+#include <memory>
+
+struct BaseExpr;
+using BaseExprPtr = std::unique_ptr< BaseExpr >;
+
+template < typename T, typename... Args >
+BaseExprPtr make_expr( Args... args )
+{
+    return std::make_unique< T >( std::forward< Args >( args )... );
+}
 
 struct Visitor;
 
@@ -10,10 +20,10 @@ struct BaseExpr {
 };
 
 struct BinaryExpr : public BaseExpr {
-    BaseExpr l, r;
+    BaseExprPtr l, r;
     Token token;
 
-    BinaryExpr( BaseExpr l, Token token, BaseExpr r );
+    BinaryExpr( BaseExprPtr l, Token token, BaseExprPtr r );
     void accept( Visitor& ) override;
 };
 
@@ -25,17 +35,17 @@ struct LiteralExpr : public BaseExpr {
 };
 
 struct GroupingExpr : public BaseExpr {
-    BaseExpr expr;
+    BaseExprPtr expr;
 
-    GroupingExpr( BaseExpr expr );
+    GroupingExpr( BaseExprPtr expr );
     void accept( Visitor& visitor ) override;
 };
 
 struct UnaryExpr : public BaseExpr {
-    BaseExpr expr;
+    BaseExprPtr expr;
     Token op;
 
-    UnaryExpr( Token op, BaseExpr expr );
+    UnaryExpr( Token op, BaseExprPtr expr );
     void accept( Visitor& visitor ) override;
 };
 

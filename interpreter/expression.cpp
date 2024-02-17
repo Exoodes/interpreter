@@ -3,9 +3,9 @@
 #include <iostream>
 
 void BinaryExpr::accept( Visitor& visitor ) { visitor.visitBinaryExpr( *this ); }
-BinaryExpr::BinaryExpr( BaseExpr l, Token token, BaseExpr r )
-    : l( l )
-    , r( r )
+BinaryExpr::BinaryExpr( BaseExprPtr l, Token token, BaseExprPtr r )
+    : l( std::move( l ) )
+    , r( std::move( r ) )
     , token( token )
 {}
 
@@ -17,13 +17,13 @@ LiteralExpr::LiteralExpr( token_value_t value )
 
 
 void GroupingExpr::accept( Visitor& visitor ) { visitor.visitGroupingExpr( *this ); }
-GroupingExpr::GroupingExpr( BaseExpr expr )
-    : expr( expr )
+GroupingExpr::GroupingExpr( BaseExprPtr expr )
+    : expr( std::move( expr ) )
 {}
 
 
 void UnaryExpr::accept( Visitor& visitor ) { visitor.visitUnaryExpr( *this ); }
-UnaryExpr::UnaryExpr( Token op, BaseExpr expr )
-    : expr( expr )
+UnaryExpr::UnaryExpr( Token op, BaseExprPtr expr )
+    : expr( std::move( expr ) )
     , op( op )
 {}

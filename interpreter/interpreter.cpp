@@ -11,12 +11,12 @@ int main( int, const char** argv )
     Lexer lexer( file_contents );
     std::vector< Token > tokens = lexer.generete_tokens();
 
-    auto expr = BinaryExpr( LiteralExpr( std::monostate{} ),
-                            Token( TokenType::PLUS, std::monostate{}, "+", 1 ),
-                            UnaryExpr( Token( TokenType::MINUS, std::monostate{}, "-", 1 ),
-                                       LiteralExpr( 12 ) ) );
-
-    PrintVisitor().print( expr );
+    BaseExprPtr expr =
+    make_expr< BinaryExpr >( make_expr< LiteralExpr >( std::monostate{} ),
+                             Token( TokenType::PLUS, std::monostate{}, "+", 1 ),
+                             make_expr< UnaryExpr >( Token( TokenType::MINUS, std::monostate{}, "-", 1 ),
+                                                     make_expr< LiteralExpr >( 12 ) ) );
+    PrintVisitor().print( *expr );
 
     return EXIT_SUCCESS;
 }

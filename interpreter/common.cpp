@@ -28,9 +28,9 @@ void PrintVisitor::print( BaseExpr& expr )
 void PrintVisitor::visitBinaryExpr( BinaryExpr& expr )
 {
     std::cout << "( " << expr.token.lexeme << " ";
-    expr.l.accept( *this );
+    expr.l->accept( *this );
     std::cout << " ";
-    expr.r.accept( *this );
+    expr.r->accept( *this );
     std::cout << ")";
 }
 
@@ -46,13 +46,13 @@ void PrintVisitor::visitLiteralExpr( LiteralExpr& expr )
 void PrintVisitor::visitGroupingExpr( GroupingExpr& expr )
 {
     std::cout << "( group ";
-    expr.expr.accept( *this );
+    expr.expr->accept( *this );
     std::cout << " )";
 }
 
 void PrintVisitor::visitUnaryExpr( UnaryExpr& expr )
 {
     std::cout << "( " << expr.op.lexeme << " ";
-    expr.expr.accept( *this );
+    expr.expr->accept( *this );
     std::cout << " )";
 }
