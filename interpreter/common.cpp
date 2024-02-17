@@ -25,13 +25,25 @@ void PrintVisitor::print( BaseExpr& expr )
     std::cout << std::endl;
 }
 
+void PrintVisitor::paranthesize( std::string s, BaseExpr& expr )
+{
+    std::cout << "( " << s << " ";
+    expr.accept( *this );
+    std::cout << " )";
+}
+
+void PrintVisitor::paranthesize( std::string s, BaseExpr& expr_l, BaseExpr& expr_r )
+{
+    std::cout << "( " << s << " ";
+    expr_l.accept( *this );
+    std::cout << " ";
+    expr_r.accept( *this );
+    std::cout << " )";
+}
+
 void PrintVisitor::visitBinaryExpr( BinaryExpr& expr )
 {
-    std::cout << "( " << expr.token.lexeme << " ";
-    expr.l->accept( *this );
-    std::cout << " ";
-    expr.r->accept( *this );
-    std::cout << ")";
+    paranthesize( expr.token.lexeme, *expr.l, *expr.r );
 }
 
 void PrintVisitor::visitLiteralExpr( LiteralExpr& expr )
@@ -43,16 +55,6 @@ void PrintVisitor::visitLiteralExpr( LiteralExpr& expr )
                 expr.value );
 }
 
-void PrintVisitor::visitGroupingExpr( GroupingExpr& expr )
-{
-    std::cout << "( group ";
-    expr.expr->accept( *this );
-    std::cout << " )";
-}
+void PrintVisitor::visitGroupingExpr( GroupingExpr& expr ) { paranthesize( "group", *expr.expr ); }
 
-void PrintVisitor::visitUnaryExpr( UnaryExpr& expr )
-{
-    std::cout << "( " << expr.op.lexeme << " ";
-    expr.expr->accept( *this );
-    std::cout << " )";
-}
+void PrintVisitor::visitUnaryExpr( UnaryExpr& expr ) { paranthesize( expr.op.lexeme, *expr.expr ); }
